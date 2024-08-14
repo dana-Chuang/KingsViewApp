@@ -20,6 +20,7 @@ import { RouterLink, RouterView } from 'vue-router'
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  align-items: center;
 }
 
 .navigation-bar {
