@@ -28,8 +28,8 @@ async function getAllUsersList() {
 </script>
 
 <template>
-  <div>
-    <table id="users">
+  <div class="userView">
+    <table id="userTable">
       <tr>
         <th>Employee Number</th>
         <th>Company Code</th>
@@ -57,27 +57,31 @@ async function getAllUsersList() {
 </template>
 
 <style scoped>
-#users {
+.userView {
+  padding-top: 15px;
+}
+
+#userTable {
   font-family: Arial, Helvetica, sans-serif;
   border-collapse: collapse;
   width: 100%;
 }
 
-#users td,
-#users th {
+#userTable td,
+#userTable th {
   border: 1px solid #ddd;
   padding: 8px;
 }
 
-#users tr:nth-child(even) {
+#userTable tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-#users tr:hover {
+#userTable tr:hover {
   background-color: #ddd;
 }
 
-#users th {
+#userTable th {
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
