@@ -1,6 +1,29 @@
 <script setup lang="ts">
+import axios from 'axios'
+import { onMounted, ref } from 'vue'
+import type { Users } from '../models/user'
+
+var allUsersList = ref<Users[]>([])
+
+onMounted(async () => {
+  getAllUsersList()
+})
+
 function ChangePassword() {
   alert('change password')
+}
+
+async function getAllUsersList() {
+  const response = await axios.get('/api/WeatherForecast')
+  allUsersList.value = response.data.map((user) => ({
+    Id: user.Id,
+    companyCode: user.companyCode,
+    employeeNo: user.employeeNo,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    password: user.password,
+    status: user.status == 1 ? true : false
+  }))
 }
 </script>
 
@@ -17,14 +40,14 @@ function ChangePassword() {
         <th>Password</th>
         <th>Action</th>
       </tr>
-      <tr>
-        <td>CS001</td>
-        <td>001</td>
+      <tr v-for="user in allUsersList" :key="user.Id">
+        <td>{{ user.employeeNo }}</td>
+        <td>{{ user.companyCode }}</td>
         <td>US</td>
-        <td>David</td>
-        <td>Sun</td>
-        <td>Active</td>
-        <td>1234qwer</td>
+        <td>{{ user.firstName }}</td>
+        <td>{{ user.lastName }}</td>
+        <td>{{ user.status ? 'Active' : 'Inactive' }}</td>
+        <td>{{ user.password }}</td>
         <td>
           <input type="button" value="Change Password" @click="ChangePassword" />
         </td>
