@@ -14,7 +14,7 @@ function ChangePassword() {
 }
 
 async function getAllUsersList() {
-  const response = await axios.get('/api/WeatherForecast')
+  const response = await axios.get('/api/Users/GetAllUsers')
   allUsersList.value = response.data.map((user) => ({
     Id: user.Id,
     companyCode: user.companyCode,
