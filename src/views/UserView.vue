@@ -2,15 +2,25 @@
 import axios from 'axios'
 import { onMounted, ref } from 'vue'
 import type { Users } from '../models/user'
+import PasswordPopUp from '../components/PasswordPopUp.vue'
 
 var allUsersList = ref<Users[]>([])
+var passwordWindowToggle = ref(false)
+var targetedEmployeeNo = ref('')
+var targetedEmployeeName = ref('')
 
 onMounted(async () => {
   getAllUsersList()
 })
 
-function ChangePassword() {
-  alert('change password')
+const togglePopup = (toggle: boolean) => {
+  passwordWindowToggle.value = toggle
+}
+
+const resetPassword = (toggle: boolean, eeNo: string, eeFirstName: string, eeLastName: string) => {
+  togglePopup(toggle)
+  targetedEmployeeNo.value = eeNo
+  targetedEmployeeName.value = `${eeFirstName} ${eeLastName}`
 }
 
 async function getAllUsersList() {
@@ -49,10 +59,21 @@ async function getAllUsersList() {
         <td>{{ user.status ? 'Active' : 'Inactive' }}</td>
         <td>{{ user.password }}</td>
         <td>
-          <input type="button" value="Change Password" @click="ChangePassword" />
+          <input
+            type="button"
+            value="Change Password"
+            @click="resetPassword(true, user.employeeNo, user.firstName, user.lastName)"
+          />
         </td>
       </tr>
     </table>
+    <PasswordPopUp
+      v-if="passwordWindowToggle"
+      :employeeNo="targetedEmployeeNo"
+      :employeeName="targetedEmployeeName"
+      @ClosePopup="togglePopup"
+    >
+    </PasswordPopUp>
   </div>
 </template>
 
