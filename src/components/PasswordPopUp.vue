@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+var newPassword = ref('')
+var confirmPassword = ref('')
+var errorMessage = ref('')
+var showErrorMsg = ref(false)
+
 const props = defineProps({
+  employeeId: {
+    type: Number
+  },
   employeeNo: {
     type: String,
     default: ''
@@ -13,10 +22,20 @@ const props = defineProps({
     default: false
   }
 })
-const emit = defineEmits(['ClosePopup'])
+const emit = defineEmits(['ClosePopup', 'submitNewPassword'])
 
 function closePopup() {
   emit('ClosePopup', false)
+}
+
+function submitNewPassword() {
+  if (newPassword.value == confirmPassword.value) {
+    emit('submitNewPassword', newPassword.value)
+    closePopup()
+  } else {
+    errorMessage.value = 'Passwords do not match.'
+    showErrorMsg.value = true
+  }
 }
 </script>
 
@@ -25,7 +44,7 @@ function closePopup() {
     <div class="popup-inner">
       <button class="popup-close" @click="closePopup">X</button>
       <h2>Reset Password</h2>
-      <form>
+      <form class="newPasswordForm" @submit.prevent="submitNewPassword">
         <div>
           <label for="ee-number">Employee No:</label>
           <input type="text" id="ee-no" :value="employeeNo" readonly />
@@ -41,6 +60,9 @@ function closePopup() {
         <div>
           <label for="confirm-password">Confirm Password:</label>
           <input type="password" id="confirm-password" v-model="confirmPassword" required />
+        </div>
+        <div class="error-message" v-if="showErrorMsg">
+          <a>{{ errorMessage }}</a>
         </div>
         <button class="submit-button" type="submit">Submit</button>
       </form>
@@ -69,9 +91,7 @@ function closePopup() {
   background-color: #f7f9fa;
   width: 600px;
   height: 480px;
-  padding-top: 10px;
-  padding-left: 25px;
-  padding-right: 25px;
+  padding: 25px;
 }
 
 form div {
@@ -111,8 +131,12 @@ button {
 }
 
 .submit-button {
-  display: block;
-  width: 100%;
+  position: absolute; /* Make the submit button absolutely positioned */
+  bottom: 25px; /* Distance from the bottom of popup-inner */
+  left: 0;
+  right: 0;
+  width: 90%; /* Ensure the button takes up most of the width */
+  margin: 0 auto; /* Center the button horizontally */
   padding: 10px;
   background-color: #007bff;
   border: none;
@@ -122,5 +146,10 @@ button {
 button:hover {
   background-color: #0d4891;
   color: white;
+}
+
+.error-message {
+  font-size: 12px;
+  color: #c41320;
 }
 </style>

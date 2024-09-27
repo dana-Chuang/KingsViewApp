@@ -6,6 +6,7 @@ import PasswordPopUp from '../components/PasswordPopUp.vue'
 
 var allUsersList = ref<Users[]>([])
 var passwordWindowToggle = ref(false)
+var targetedEmployeeId = ref(0)
 var targetedEmployeeNo = ref('')
 var targetedEmployeeName = ref('')
 
@@ -17,16 +18,33 @@ const togglePopup = (toggle: boolean) => {
   passwordWindowToggle.value = toggle
 }
 
-const resetPassword = (toggle: boolean, eeNo: string, eeFirstName: string, eeLastName: string) => {
+const resetPassword = (toggle: boolean, user: Users) => {
   togglePopup(toggle)
-  targetedEmployeeNo.value = eeNo
-  targetedEmployeeName.value = `${eeFirstName} ${eeLastName}`
+  targetedEmployeeId.value = user.Id
+  targetedEmployeeNo.value = user.employeeNo
+  targetedEmployeeName.value = `${user.firstName} ${user.lastName}`
+}
+
+const submitNewPassword = async (newPw: string) => {
+  try {
+    const payload = {
+      id: targetedEmployeeId.value,
+      newPassword: newPw,
+      updatedBy: 'AdminUser'
+    }
+
+    const response = await axios.post('/api/Users/UpdatePassword', payload)
+
+    console.log('Password updated successfully', response.data)
+  } catch (error) {
+    console.error('Error updating password:', error)
+  }
 }
 
 async function getAllUsersList() {
   const response = await axios.get('/api/Users/GetAllUsers')
   allUsersList.value = response.data.map((user) => ({
-    Id: user.Id,
+    Id: user.id,
     companyCode: user.companyCode,
     employeeNo: user.employeeNo,
     firstName: user.firstName,
@@ -59,11 +77,7 @@ async function getAllUsersList() {
         <td>{{ user.status ? 'Active' : 'Inactive' }}</td>
         <td>{{ user.password }}</td>
         <td>
-          <input
-            type="button"
-            value="Change Password"
-            @click="resetPassword(true, user.employeeNo, user.firstName, user.lastName)"
-          />
+          <input type="button" value="Change Password" @click="resetPassword(true, user)" />
         </td>
       </tr>
     </table>
@@ -72,6 +86,7 @@ async function getAllUsersList() {
       :employeeNo="targetedEmployeeNo"
       :employeeName="targetedEmployeeName"
       @ClosePopup="togglePopup"
+      @submitNewPassword="submitNewPassword"
     >
     </PasswordPopUp>
   </div>
