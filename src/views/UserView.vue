@@ -27,13 +27,11 @@ const resetPassword = (toggle: boolean, user: Users) => {
 
 const submitNewPassword = async (newPw: string) => {
   try {
-    const payload = {
-      id: targetedEmployeeId.value,
-      newPassword: newPw,
-      updatedBy: 'AdminUser'
-    }
-
-    const response = await axios.post('/api/Users/UpdatePassword', payload)
+    const response = await axios.put('/api/Users/UpdatePassword', {
+      Id: targetedEmployeeId.value,
+      NewPassword: newPw,
+      UpdatedBy: 'AdminUser'
+    })
 
     console.log('Password updated successfully', response.data)
   } catch (error) {
