@@ -34,6 +34,7 @@ const submitNewPassword = async (newPw: string) => {
     })
 
     console.log('Password updated successfully', response.data)
+    window.location.reload()
   } catch (error) {
     console.error('Error updating password:', error)
   }
@@ -72,7 +73,9 @@ async function getAllUsersList() {
         <td>US</td>
         <td>{{ user.firstName }}</td>
         <td>{{ user.lastName }}</td>
-        <td>{{ user.status ? 'Active' : 'Inactive' }}</td>
+        <td :class="{ 'active-status': user.status, 'inactive-status': !user.status }">
+          {{ user.status ? 'Active' : 'Inactive' }}
+        </td>
         <td>{{ user.password }}</td>
         <td>
           <input type="button" value="Change Password" @click="resetPassword(true, user)" />
@@ -121,5 +124,12 @@ async function getAllUsersList() {
   text-align: left;
   background-color: #696969;
   color: white;
+}
+.active-status {
+  color: green;
+}
+
+.inactive-status {
+  color: #c41320;
 }
 </style>
