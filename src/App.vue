@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-//    <img class="logo" src="../src/components/icons/logo.png" />
 </script>
 
 <template>
