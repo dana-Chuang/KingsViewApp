@@ -1,12 +1,22 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
+import axios from 'axios'
 
 var username = ref('')
 var password = ref('')
 const router = useRouter()
-function login() {
-  router.push('/home')
+const login = async () => {
+  try {
+    const response = await axios.put('/api/Users/UpdatePassword', {
+      UserName: username.value,
+      Password: password.value
+    })
+    console.log('Login successfully', response.data)
+    router.push('/home')
+  } catch (error) {
+    console.error('Error logining:', error)
+  }
 }
 </script>
 
@@ -19,8 +29,8 @@ function login() {
       <div class="login-word">
         <h2>Login</h2>
       </div>
-      <form>
-        <div class="input-group">
+      <form class="loginForm" @submit.prevent="login">
+        <div>
           <label for="username">Username</label>
           <input
             type="text"
@@ -30,7 +40,7 @@ function login() {
             required
           />
         </div>
-        <div class="input-group">
+        <div>
           <label for="password">Password</label>
           <input
             type="password"
