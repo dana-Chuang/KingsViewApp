@@ -2,14 +2,38 @@
 import axios from 'axios'
 import { onMounted, ref } from 'vue'
 import type { Users } from '../models/user'
+import AddAdminPopUp from '../components/AddAdminPopUp.vue'
 
 var allAdminsList = ref<Users[]>([])
+var allNonAdminsList = ref<Users[]>([])
+var addAdminWindowToggle = ref(false)
+var targetedEmployeeNo = ref('')
+var targetedEmployeeName = ref('')
 
 onMounted(async () => {
-  getAllAdminsList()
+  fetchUsersByAdminStatus()
 })
 
-async function getAllAdminsList() {
+const togglePopup = (toggle: boolean) => {
+  addAdminWindowToggle.value = toggle
+}
+
+const submitNewPassword = async (newPw: string) => {
+  try {
+    const response = await axios.put('/api/Users/UpdatePassword', {
+      Id: 1,
+      NewPassword: newPw,
+      UpdatedBy: 'AdminUser'
+    })
+
+    console.log('Password updated successfully', response.data)
+    window.location.reload()
+  } catch (error) {
+    console.error('Error updating password:', error)
+  }
+}
+
+async function fetchUsersByAdminStatus() {
   const response = await axios.get('/api/Users/GetAllUsers')
   allAdminsList.value = response.data
     .filter((user) => user.isAdmin == 1) // filter users where isAdmin is true
@@ -23,10 +47,38 @@ async function getAllAdminsList() {
       password: user.password,
       status: user.status == 1 ? true : false
     }))
+
+  allNonAdminsList.value = response.data
+    .filter((user) => user.isAdmin == 0) // filter users where isAdmin is false
+    .map((user) => ({
+      Id: user.id,
+      companyCode: user.companyCode,
+      employeeNo: user.employeeNo,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      password: user.password,
+      status: user.status == 1 ? true : false
+    }))
+}
+
+function submitNewAdmin(userId) {
+  console.log('Add admin for user:', userId)
+  // Logic to add the user as admin
 }
 </script>
 
 <template>
+  <div class="add-admin-view">
+    <button class="add-admin-button" @click="togglePopup(true)">Add Admin</button>
+    <AddAdminPopUp
+      v-if="addAdminWindowToggle"
+      :nonAdminList="allNonAdminsList"
+      @ClosePopup="togglePopup"
+      @addAdmin="submitNewAdmin"
+    >
+    </AddAdminPopUp>
+  </div>
   <div class="adminView">
     <table id="adminTable">
       <tr>
@@ -59,6 +111,32 @@ async function getAllAdminsList() {
   </div>
 </template>
 <style scoped>
+.add-admin-view {
+  display: flex;
+  width: 100%;
+  padding-left: 150px;
+}
+.add-admin-button {
+  color: #fff;
+  background-color: #c8102e;
+  border-color: #c8102e;
+  cursor: pointer;
+  text-align: center;
+  border: none;
+  padding: 15px 32px;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 5px;
+  display: inline-flex;
+  font-family: myriad-pro, sans-serif;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.add-admin-button:hover {
+  background-color: #c41320; /* Kigngston red */
+}
+
 .adminView {
   padding-top: 15px;
 }
