@@ -6,9 +6,6 @@ var errorMessage = ref('')
 var showErrorMsg = ref(false)
 
 const props = defineProps({
-  employeeId: {
-    type: Number
-  },
   employeeNo: {
     type: String,
     default: ''
