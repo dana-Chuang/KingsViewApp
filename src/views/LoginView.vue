@@ -3,19 +3,33 @@ import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import axios from 'axios'
 
-var username = ref('')
+var email = ref('')
 var password = ref('')
+var showErrorMsg = ref(false)
+var errorMessage = ref('')
 const router = useRouter()
 const login = async () => {
-  try {
-    const response = await axios.put('/api/Users/UpdatePassword', {
-      UserName: username.value,
-      Password: password.value
-    })
-    console.log('Login successfully', response.data)
-    router.push('/home')
-  } catch (error) {
-    console.error('Error logining:', error)
+  if (email.value == '' || password.value == '') {
+    errorMessage.value = 'Please enter email and password'
+    showErrorMsg.value = true
+  } else if (!email.value.endsWith('@kingston.com')) {
+    errorMessage.value = 'Email must be Kingston email'
+    showErrorMsg.value = true
+  } else {
+    try {
+      const response = await axios.post('/api/Login/Login', {
+        Email: email.value,
+        Password: password.value
+      })
+      console.log('Login successfully', response.data)
+      errorMessage.value = ''
+      showErrorMsg.value = false
+      router.push('/home')
+    } catch (error) {
+      errorMessage.value = 'Incorrect Email or password'
+      showErrorMsg.value = true
+      console.error('Error logining:', error)
+    }
   }
 }
 </script>
@@ -29,14 +43,14 @@ const login = async () => {
       <div class="login-word">
         <h2>Login</h2>
       </div>
-      <form class="loginForm" @submit.prevent="login">
+      <form class="login-form" @submit.prevent="login">
         <div>
-          <label for="username">Username</label>
+          <label for="email">Email</label>
           <input
             type="text"
-            id="username"
-            v-model="username"
-            placeholder="Enter your username"
+            id="email"
+            v-model="email"
+            placeholder="Enter your Kingston email"
             required
           />
         </div>
@@ -49,6 +63,9 @@ const login = async () => {
             placeholder="Enter your password"
             required
           />
+        </div>
+        <div class="error-message" v-if="showErrorMsg">
+          <a>{{ errorMessage }}</a>
         </div>
         <button type="submit" class="login-btn" @click="login">Log In</button>
       </form>
@@ -87,10 +104,19 @@ const login = async () => {
 .login-box {
   background-color: #353535;
   width: 450px;
-  height: 300px;
+  height: 330px;
   border-radius: 15px;
   color: #d8d8d8;
   padding: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 form div {
@@ -115,9 +141,8 @@ input[type='password'] {
 }
 
 .login-btn {
-  display: flex;
-  justify-content: center;
-  width: 99%;
+  margin-top: auto; /* Pushes the button down */
+  align-self: center;
 }
 
 button {
@@ -133,5 +158,11 @@ button {
 
 button:hover {
   background-color: #d8d8d8;
+}
+
+.error-message {
+  font-size: 12px;
+  height: 16px;
+  color: #c41320;
 }
 </style>
