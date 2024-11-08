@@ -24,6 +24,8 @@ const login = async () => {
       console.log('Login successfully', response.data)
       errorMessage.value = ''
       showErrorMsg.value = false
+      localStorage.setItem('login_name', response.data.firstName)
+      localStorage.setItem('[emp_no]', response.data.employeeNo)
       router.push('/home')
     } catch (error) {
       errorMessage.value = 'Incorrect Email or password'

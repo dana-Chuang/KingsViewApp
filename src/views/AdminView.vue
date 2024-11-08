@@ -7,6 +7,8 @@ import AddAdminPopUp from '../components/AddAdminPopUp.vue'
 var allAdminsList = ref<Users[]>([])
 var allNonAdminsList = ref<Users[]>([])
 var addAdminWindowToggle = ref(false)
+const loginName = localStorage.getItem('login_name') || 'Guest'
+const loginEmplNo = localStorage.getItem('emp_no') || '000'
 
 onMounted(async () => {
   fetchUsersByAdminStatus()
@@ -14,21 +16,6 @@ onMounted(async () => {
 
 const togglePopup = (toggle: boolean) => {
   addAdminWindowToggle.value = toggle
-}
-
-const submitNewPassword = async (newPw: string) => {
-  try {
-    const response = await axios.put('/api/Users/UpdatePassword', {
-      Id: 1,
-      NewPassword: newPw,
-      UpdatedBy: 'AdminUser'
-    })
-
-    console.log('Password updated successfully', response.data)
-    window.location.reload()
-  } catch (error) {
-    console.error('Error updating password:', error)
-  }
 }
 
 async function fetchUsersByAdminStatus() {
@@ -66,18 +53,29 @@ const submitNewAdmin = async (userId: number) => {
   try {
     const response = await axios.post('/api/Users/AddAdmin', {
       Id: userId,
-      UpdatedBy: 'AdminUser'
+      UpdatedBy: `${loginName} ${loginEmplNo}`
     })
     console.log('Add Admin successfully', response.data)
     window.location.reload()
   } catch (error) {
-    console.error('Error logining:', error)
+    console.error('Error Adding Admin:', error)
   }
 }
 
-function toggleStatus(userId: number) {
-  console.log('Change admin status:', userId)
-  //Logic to change admin status
+const toggleStatus = async (userId: number, orginalStatus: boolean) => {
+  console.log('Change admin status:', userId, orginalStatus)
+  //Logic to change admin status\
+  try {
+    const response = await axios.post('/api/Users/ChangeAdminStatus', {
+      Id: userId,
+      OriginalStatus: orginalStatus,
+      UpdatedBy: `${loginName} ${loginEmplNo}`
+    })
+    console.log('Change Admin Status successfully', response.data)
+    window.location.reload()
+  } catch (error) {
+    console.error('Error Changing Admin Status:', error)
+  }
 }
 </script>
 
@@ -118,7 +116,11 @@ function toggleStatus(userId: number) {
         <td>{{ admin.password }}</td>
         <td>
           <label class="switch">
-            <input type="checkbox" :checked="admin.adminStatus" @change="toggleStatus(admin.Id)" />
+            <input
+              type="checkbox"
+              :checked="admin.adminStatus"
+              @change="toggleStatus(admin.Id, admin.adminStatus)"
+            />
             <span class="slider"></span>
           </label>
         </td>

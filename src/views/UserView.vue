@@ -9,6 +9,8 @@ var passwordWindowToggle = ref(false)
 var targetedEmployeeId = ref(0)
 var targetedEmployeeNo = ref('')
 var targetedEmployeeName = ref('')
+const loginName = localStorage.getItem('login_name') || 'Guest'
+const loginEmplNo = localStorage.getItem('emp_no') || '000'
 
 onMounted(async () => {
   getAllUsersList()
@@ -30,7 +32,7 @@ const submitNewPassword = async (newPw: string) => {
     const response = await axios.put('/api/Users/UpdatePassword', {
       Id: targetedEmployeeId.value,
       NewPassword: newPw,
-      UpdatedBy: 'AdminUser'
+      UpdatedBy: `${loginName} ${loginEmplNo}`
     })
 
     console.log('Password updated successfully', response.data)

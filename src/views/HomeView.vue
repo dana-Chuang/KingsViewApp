@@ -2,7 +2,9 @@
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const loginName = localStorage.getItem('login_name') || 'Guest'
 function logout() {
+  localStorage.removeItem('login_name')
   router.push('/login')
 }
 </script>
@@ -13,6 +15,7 @@ function logout() {
     <button class="logout-btn" @click="logout">Log Out</button>
   </div>
   <div class="contentView">
+    <span class="welcome-message">Welcome back, {{ loginName }}</span>
     <div class="navigation-bar">
       <router-link to="/user">Users</router-link> |
       <router-link to="/admin">Admin</router-link>
