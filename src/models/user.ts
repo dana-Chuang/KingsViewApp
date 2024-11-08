@@ -8,4 +8,5 @@ export interface Users {
   isAdmin: boolean
   password: string
   status: boolean
+  adminStatus: boolean
 }

@@ -7,8 +7,6 @@ import AddAdminPopUp from '../components/AddAdminPopUp.vue'
 var allAdminsList = ref<Users[]>([])
 var allNonAdminsList = ref<Users[]>([])
 var addAdminWindowToggle = ref(false)
-var targetedEmployeeNo = ref('')
-var targetedEmployeeName = ref('')
 
 onMounted(async () => {
   fetchUsersByAdminStatus()
@@ -45,7 +43,7 @@ async function fetchUsersByAdminStatus() {
       lastName: user.lastName,
       email: user.email,
       password: user.password,
-      status: user.status == 1 ? true : false
+      adminStatus: user.adminStatus == 1 ? true : false
     }))
 
   allNonAdminsList.value = response.data
@@ -58,13 +56,28 @@ async function fetchUsersByAdminStatus() {
       lastName: user.lastName,
       email: user.email,
       password: user.password,
-      status: user.status == 1 ? true : false
+      adminStatus: user.adminStatus == 1 ? true : false
     }))
 }
 
-function submitNewAdmin(userId) {
+const submitNewAdmin = async (userId: number) => {
   console.log('Add admin for user:', userId)
   // Logic to add the user as admin
+  try {
+    const response = await axios.post('/api/Users/AddAdmin', {
+      Id: userId,
+      UpdatedBy: 'AdminUser'
+    })
+    console.log('Add Admin successfully', response.data)
+    window.location.reload()
+  } catch (error) {
+    console.error('Error logining:', error)
+  }
+}
+
+function toggleStatus(userId: number) {
+  console.log('Change admin status:', userId)
+  //Logic to change admin status
 }
 </script>
 
@@ -88,9 +101,9 @@ function submitNewAdmin(userId) {
         <th>First Name</th>
         <th>Last Name</th>
         <th>Email</th>
-        <th>Status</th>
+        <th>Admin Status</th>
         <th>Password</th>
-        <th>Action</th>
+        <th>Status Action</th>
       </tr>
       <tr v-for="admin in allAdminsList" :key="admin.Id">
         <td>{{ admin.employeeNo }}</td>
@@ -99,17 +112,21 @@ function submitNewAdmin(userId) {
         <td>{{ admin.firstName }}</td>
         <td>{{ admin.lastName }}</td>
         <td>{{ admin.email }}</td>
-        <td :class="{ 'active-status': admin.status, 'inactive-status': !admin.status }">
-          {{ admin.status ? 'Active' : 'Inactive' }}
+        <td :class="{ 'active-status': admin.adminStatus, 'inactive-status': !admin.adminStatus }">
+          {{ admin.adminStatus ? 'Active' : 'Inactive' }}
         </td>
         <td>{{ admin.password }}</td>
         <td>
-          <input type="button" value="Change Password" />
+          <label class="switch">
+            <input type="checkbox" :checked="admin.adminStatus" @change="toggleStatus(admin.Id)" />
+            <span class="slider"></span>
+          </label>
         </td>
       </tr>
     </table>
   </div>
 </template>
+
 <style scoped>
 .add-admin-view {
   display: flex;
@@ -174,5 +191,50 @@ function submitNewAdmin(userId) {
 
 .inactive-status {
   color: #c41320;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
 }
 </style>

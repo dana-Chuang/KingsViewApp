@@ -16,6 +16,7 @@ function closePopup() {
 
 function addAdmin(userId) {
   emit('addAdmin', userId)
+  closePopup()
 }
 </script>
 
@@ -26,7 +27,7 @@ function addAdmin(userId) {
       <h2>Add Admin</h2>
       <ul>
         <li v-for="user in nonAdminList" :key="user.Id">
-          {{ user.firstName }} {{ user.lastName }}
+          {{ user.firstName }} {{ user.lastName }} {{ user.employeeNo }}
           <button @click="addAdmin(user.Id)">Add Admin</button>
         </li>
       </ul>
@@ -58,32 +59,30 @@ function addAdmin(userId) {
   padding: 25px;
 }
 
-form div {
-  margin-bottom: 15px;
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 10px 0 0 0;
 }
 
-label {
-  display: block;
-  margin-bottom: 5px;
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
-input[type='text'],
-input[type='password'] {
-  width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
-}
-
-input[readonly] {
-  background-color: #f0f0f0;
-  color: #333;
-  border: 1px solid #ccc;
-}
-
-button {
-  cursor: pointer;
+li button {
+  padding: 5px 10px;
+  background-color: #007bff;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+li button:hover {
+  background-color: #0056b3;
 }
 
 .popup-close {
